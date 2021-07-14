@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="questionsFilePath" class="java.lang.String">
+        <constructor-arg value="/questions.csv"/>
+    </bean>
+
+    <bean id="csvReaderService" class="ru.otus.spring.studenttests.service.CSVReaderService">
+        <constructor-arg name="questionsFilePath" ref="questionsFilePath"/>
+    </bean>
+
+    <bean id="answerMapper" class="ru.otus.spring.studenttests.mapper.AnswerMapper">
+    </bean>
+
+    <bean id="questionMapper" class="ru.otus.spring.studenttests.mapper.QuestionMapper">
+    </bean>
+
+    <bean id="fillQuestionService" class="ru.otus.spring.studenttests.service.FillQuestionService">
+        <constructor-arg name="answerMapper" ref="answerMapper"/>
+        <constructor-arg name="questionMapper" ref="questionMapper"/>
+        <constructor-arg name="csvReaderService" ref="csvReaderService"/>
+    </bean>
+
+    <bean id="printService" class="ru.otus.spring.studenttests.service.PrintService">
+        <constructor-arg name="fillQuestionService" ref="fillQuestionService"/>
+    </bean>
+
+</beans>
