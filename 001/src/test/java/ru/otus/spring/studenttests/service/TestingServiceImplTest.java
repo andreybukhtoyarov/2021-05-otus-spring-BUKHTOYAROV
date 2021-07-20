@@ -1,6 +1,8 @@
 package ru.otus.spring.studenttests.service;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.otus.spring.studenttests.config.TestConfig;
 
@@ -8,12 +10,14 @@ import java.io.ByteArrayOutputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest(classes = {TestConfig.class})
 class TestingServiceImplTest {
+
+    @Autowired
+    private TestingService testingService;
 
     @Test
     public void test() {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(TestConfig.class);
-        TestingService testingService = context.getBean(TestingServiceImpl.class);
         testingService.startTest();
         ByteArrayOutputStream out = TestConfig.getOUTPUT_STREAM();
         String expected = "Enter your full name\n" +

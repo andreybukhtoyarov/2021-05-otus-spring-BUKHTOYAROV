@@ -1,0 +1,8 @@
+spring:
+  banner:
+    image:
+      location: /resources/banner.txt
+  messages:
+    basename: /resources/i18n/messages
+app:
+  localization: "ru-RU"
