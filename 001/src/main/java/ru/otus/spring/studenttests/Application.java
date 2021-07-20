@@ -1,14 +1,18 @@
 package ru.otus.spring.studenttests;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import ru.otus.spring.studenttests.service.PrintService;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import ru.otus.spring.studenttests.config.Config;
+import ru.otus.spring.studenttests.service.TestingService;
+import ru.otus.spring.studenttests.service.TestingServiceImpl;
 
+@ComponentScan
 public class Application {
 
     public static void main(String[] args) {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/spring-context.xml");
-        PrintService printService = context.getBean(PrintService.class);
-        printService.print();
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Application.class);
+        TestingService testingService = context.getBean(TestingServiceImpl.class);
+        testingService.startTest();
     }
 
 }
