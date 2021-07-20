@@ -1,9 +1,13 @@
 package ru.otus.spring.studenttests.config;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import ru.otus.spring.studenttests.mapper.AnswerMapper;
 import ru.otus.spring.studenttests.mapper.QuestionMapper;
 import ru.otus.spring.studenttests.service.*;
@@ -13,14 +17,20 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-@Configuration
+@Import(AppProperties.class)
+@RequiredArgsConstructor
+@SpringBootConfiguration
 public class TestConfig {
 
-    private final String path = "/questions.csv";
+    private final AppProperties appProperties;
+    private final MessageSource messageSource;
 
     @Bean
-    public Set<Integer> answerIn() {
-        return Set.of(0, 1, 2, 3);
+    public String questionsFilePath() {
+        if ("ru_RU".equals(appProperties.getLocalization())) {
+            return "/questions_ru_RU.csv";
+        }
+        return "/questions.csv";
     }
 
     @Getter
@@ -31,7 +41,7 @@ public class TestConfig {
 
     @Bean
     public CSVReaderService getCSVReaderService() {
-        return new CSVReaderServiceImpl(path);
+        return new CSVReaderServiceImpl(questionsFilePath());
     }
 
     @Bean
@@ -51,7 +61,7 @@ public class TestConfig {
 
     @Bean
     public TestingService getTestingServiceImpl() {
-        return new TestingServiceImpl(getFillQuestionService(), INPUT_STREAM, OUTPUT_STREAM, answerIn());
+        return new TestingServiceImpl(appProperties, getFillQuestionService(), messageSource, INPUT_STREAM, OUTPUT_STREAM);
     }
 
 }

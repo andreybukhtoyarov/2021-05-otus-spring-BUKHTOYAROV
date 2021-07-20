@@ -1,10 +1,13 @@
 package ru.otus.spring.studenttests.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import ru.otus.spring.studenttests.config.AppProperties;
 import ru.otus.spring.studenttests.model.Answer;
 import ru.otus.spring.studenttests.model.Question;
 
+import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -14,32 +17,46 @@ import java.util.*;
 @RequiredArgsConstructor
 public class TestingServiceImpl implements TestingService {
 
+    private final AppProperties appProperties;
+    private Locale locale;
+
     private final FillQuestionService fillQuestionService;
+    private final MessageSource messageSource;
 
     private final InputStream inputStream;
     private final OutputStream outputStream;
 
     private String fullName;
-    private final Set<Integer> answerIn;
+    private final static Set<Integer> ANSWER_IN = Set.of(0, 1, 2, 3);
     private final Map<Question, Integer> answers = new HashMap<>();
+
+    @PostConstruct
+    private void initLocale() {
+        locale = Locale.forLanguageTag(appProperties.getLocalization());
+    }
 
     @Override
     public void startTest() {
         List<Question> questions = fillQuestionService.getQuestions();
         try (PrintWriter writer = new PrintWriter(outputStream);
              Scanner scanner = new Scanner(inputStream)) {
-            writer.println("Enter your full name");
+            writer.println(messageSource.getMessage("strings.greetings", null, locale));
             writer.flush();
             fullName = scanner.nextLine();
             questions.forEach(question -> {
-                writer.println("Question: " + question.getQuestion());
-                writer.println("Answer options:");
+                String[] answersArray = new String[] {
+                        question.getAnswers().get(0).getAnswer(),
+                        question.getAnswers().get(1).getAnswer(),
+                        question.getAnswers().get(2).getAnswer(),
+                        question.getAnswers().get(3).getAnswer()};
+                writer.println(messageSource.getMessage("strings.question", null, locale) + " " + question.getQuestion());
+                writer.println(messageSource.getMessage("strings.answeropt", null, locale));
                 writer.println(String.format(
-                                "0. %s 1. %s 2. %s 3. %s",
-                                question.getAnswers().get(0).getAnswer(),
-                                question.getAnswers().get(1).getAnswer(),
-                                question.getAnswers().get(2).getAnswer(),
-                                question.getAnswers().get(3).getAnswer()
+                        "0. %s 1. %s 2. %s 3. %s",
+                        messageSource.getMessage("strings.answer00", answersArray, locale),
+                        messageSource.getMessage("strings.answer01", answersArray, locale),
+                        messageSource.getMessage("strings.answer02", answersArray, locale),
+                        messageSource.getMessage("strings.answer03", answersArray, locale)
                         )
                 );
                 writer.flush();
@@ -47,13 +64,13 @@ public class TestingServiceImpl implements TestingService {
                 while (answer == -1) {
                     try {
                         answer = scanner.nextInt();
-                        if (!answerIn.contains(answer)) {
+                        if (!ANSWER_IN.contains(answer)) {
                             answer = -1;
                             throw new InputMismatchException();
                         }
                     } catch (InputMismatchException e) {
                         scanner.nextLine();
-                        writer.println("Please enter number in 0, 1, 2, 3.");
+                        writer.println(messageSource.getMessage("strings.error", null, locale));
                         writer.flush();
                     }
                 }
@@ -74,9 +91,9 @@ public class TestingServiceImpl implements TestingService {
             }
         }
         if (test) {
-            writer.println(fullName + " passed the test successfully");
+            writer.println(fullName + " " + messageSource.getMessage("strings.success", null, locale));
         } else {
-            writer.println(fullName + " failed the test");
+            writer.println(fullName + " " + messageSource.getMessage("strings.fail", null, locale));
         }
     }
 

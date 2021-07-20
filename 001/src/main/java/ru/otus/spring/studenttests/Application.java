@@ -1,18 +1,15 @@
 package ru.otus.spring.studenttests;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import ru.otus.spring.studenttests.config.Config;
-import ru.otus.spring.studenttests.service.TestingService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ru.otus.spring.studenttests.service.TestingServiceImpl;
 
-@ComponentScan
+@SpringBootApplication
 public class Application {
 
-    public static void main(String[] args) {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Application.class);
-        TestingService testingService = context.getBean(TestingServiceImpl.class);
-        testingService.startTest();
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args)
+				.getBean(TestingServiceImpl.class).startTest();
+	}
 
 }
